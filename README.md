@@ -4,28 +4,32 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 
 ## 📦 설치 항목
 
+### 유틸리티
+- **Stats**: 시스템 모니터 (CPU, Memory, Network 등)
+- **Rectangle**: 윈도우 관리 (무료 Magnet 대안)
+- **AppCleaner**: 앱 완전 삭제 도구
+
 ### 개발 도구
 - Homebrew
 - iTerm2
 - Oh My Zsh
 - zsh-syntax-highlighting
 - zsh-autosuggestions
+- Cursor (에디터)
 
 ### 폰트
 - D2Coding
 - D2Coding Nerd Font
 
 ### 애플리케이션
-- Cursor (에디터)
 - Notion
 - Discord
 - Slack
 - Google Chrome
 - Telegram
 - IINA (동영상 플레이어)
-- KakaoTalk
 - Tunnelblick (VPN)
-- Stats (시스템 모니터)
+
 
 ## 🚀 사용 방법
 
@@ -62,6 +66,8 @@ setup_mac/
 │   └── profile.json          # iTerm2 프로파일
 ├── stats-settings/
 │   └── Stats.plist           # Stats 설정
+├── rectangle-settings/
+│   └── com.knollsoft.Rectangle.plist
 └── README.md                 # 이 파일
 ```
 

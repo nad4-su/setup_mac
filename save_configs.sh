@@ -44,6 +44,20 @@ fi
 
 echo ""
 
+# Rectangle 설정 저장
+if [ -f "$HOME/Library/Preferences/com.knollsoft.Rectangle.plist" ]; then
+  echo "📐 Rectangle 설정 저장 중..."
+  mkdir -p "$RECTANGLE_SETTINGS_DIR"
+  cp "$HOME/Library/Preferences/com.knollsoft.Rectangle.plist" \
+     "$RECTANGLE_SETTINGS_DIR/com.knollsoft.Rectangle.plist"
+  echo "✅ Rectangle 설정 저장 완료"
+  git add "$RECTANGLE_SETTINGS_DIR/com.knollsoft.Rectangle.plist"
+else
+  echo "⚠️ Rectangle 설정 파일을 찾을 수 없습니다"
+fi
+
+echo ""
+
 # Git 상태 확인
 cd "$SCRIPT_DIR"
 echo "📂 변경된 파일:"

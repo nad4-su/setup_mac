@@ -12,8 +12,10 @@ set -e  # 에러 발생 시 스크립트 중단
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ITERM_SETTINGS_DIR="$SCRIPT_DIR/iterm2-settings"
 STATS_SETTINGS_DIR="$SCRIPT_DIR/stats-settings"
+RECTANGLE_SETTINGS_DIR="$SCRIPT_DIR/rectangle-settings"
 ITERM_PROFILE_FILE="$ITERM_SETTINGS_DIR/profile.json"
 STATS_PLIST_FILE="$STATS_SETTINGS_DIR/Stats.plist"
+RECTANGLE_PLIST_FILE="$RECTANGLE_SETTINGS_DIR/com.knollsoft.Rectangle.plist"
 
 echo "🚀 Mac 초기 개발 환경 설정을 시작합니다..."
 echo "📂 스크립트 위치: $SCRIPT_DIR"
@@ -128,6 +130,8 @@ APPS=(
   "slack"
   "google-chrome"
   "stats"
+  "rectangle"
+  "appcleaner"
 )
 
 for app in "${APPS[@]}"; do
@@ -162,6 +166,19 @@ fi
 # .zshrc 파일이 없으면 기본 템플릿 생성
 if [ ! -f ~/.zshrc ]; then
   cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+fi
+
+# Homebrew PATH 설정 확인 및 추가
+if ! grep -q "brew shellenv" ~/.zshrc; then
+  echo "🔧 Homebrew PATH 설정 추가..."
+  
+  if [[ $(uname -m) == "arm64" ]]; then
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+    echo "✅ Homebrew PATH 설정 추가 (Apple Silicon)"
+  else
+    echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zshrc
+    echo "✅ Homebrew PATH 설정 추가 (Intel)"
+  fi
 fi
 
 # ZSH_THEME 설정
@@ -233,7 +250,7 @@ echo ""
 # =============================================================================
 echo "⚙️ iTerm2 프로파일 설정 중..."
 
-# iTerm2가 실행 중이면 종료 (정확한 프로세스 이름 사용)
+# iTerm2가 실행 중이면 종료
 if pgrep -x "iTerm2" > /dev/null; then
   echo "⚠️ iTerm2가 실행 중입니다. 종료합니다..."
   killall iTerm 2>/dev/null || killall iTerm2 2>/dev/null || true
@@ -308,7 +325,8 @@ echo ""
 # =============================================================================
 echo "📊 Stats 앱 설정 중..."
 
-if brew list --cask stats &> /dev/null; then
+# Stats 설치 확인 (파일 시스템 기반)
+if [ -d "/Applications/Stats.app" ]; then
   echo "✅ Stats 설치됨"
   
   # Stats가 실행 중이면 종료
@@ -355,6 +373,68 @@ fi
 echo ""
 
 # =============================================================================
+# 10. Rectangle 앱 설정
+# =============================================================================
+echo "📐 Rectangle 앱 설정 중..."
+
+# Rectangle 설치 확인 (파일 시스템 기반)
+if [ -d "/Applications/Rectangle.app" ]; then
+  echo "✅ Rectangle 설치됨"
+  
+  # Rectangle이 실행 중이면 종료
+  if pgrep -x "Rectangle" > /dev/null; then
+    echo "⚠️ Rectangle이 실행 중입니다. Rectangle을 종료합니다..."
+    killall Rectangle 2>/dev/null || true
+    sleep 2
+  fi
+  
+  # Rectangle 설정 파일 확인
+  if [ -f "$RECTANGLE_PLIST_FILE" ]; then
+    echo "✅ Rectangle.plist 발견"
+    
+    # Rectangle 설정 파일 백업
+    RECTANGLE_PREF_FILE="$HOME/Library/Preferences/com.knollsoft.Rectangle.plist"
+    if [ -f "$RECTANGLE_PREF_FILE" ]; then
+      RECTANGLE_BACKUP="$RECTANGLE_PREF_FILE.backup_$(date +%Y%m%d_%H%M%S)"
+      cp "$RECTANGLE_PREF_FILE" "$RECTANGLE_BACKUP"
+      echo "✅ 기존 Rectangle 설정 백업: $RECTANGLE_BACKUP"
+    fi
+    
+    # 새 설정 적용
+    cp "$RECTANGLE_PLIST_FILE" "$RECTANGLE_PREF_FILE"
+    echo "✅ Rectangle 설정 적용 완료"
+    
+    # 설정 파일 권한 설정
+    chmod 644 "$RECTANGLE_PREF_FILE"
+    
+    # Rectangle 재시작
+    echo "🔄 Rectangle 재시작 중..."
+    sleep 1
+    open -a Rectangle
+    echo "✅ Rectangle 시작 완료"
+    
+  else
+    echo "⚠️ $RECTANGLE_PLIST_FILE 파일을 찾을 수 없습니다."
+    echo "   Rectangle을 실행하고 설정을 구성해주세요."
+    echo ""
+    echo "   Rectangle 기본 설정 생성 중..."
+    
+    # Rectangle 실행 (초기 설정 생성)
+    open -a Rectangle
+    sleep 3
+    
+    echo "✅ Rectangle 초기 실행 완료"
+    echo "   Preferences에서 키보드 단축키를 설정하세요."
+  fi
+  
+else
+  echo "⚠️ Rectangle이 설치되지 않았습니다."
+  echo "   brew install --cask rectangle 명령으로 수동 설치하세요."
+fi
+
+echo ""
+
+# =============================================================================
 # 완료 메시지
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -365,7 +445,6 @@ echo "📋 다음 단계:"
 echo ""
 echo "  1️⃣  iTerm2 실행 확인"
 echo "     → iTerm이 자동으로 열렸는지 확인"
-echo "     → 열리지 않았다면: Spotlight (⌘Space) → 'iTerm' 검색"
 echo ""
 echo "  2️⃣  iTerm2에서 프로파일 설정 (필수 - 30초):"
 echo "     ┌──────────────────────────────────────────┐"
@@ -377,28 +456,44 @@ echo "     │ → 'Set as Default' 선택                  │"
 echo "     └──────────────────────────────────────────┘"
 echo ""
 echo "  3️⃣  새 창 열어서 프로파일 확인 (⌘N)"
-echo "     ✓ 어두운 배경 (#1F1F1F)"
-echo "     ✓ D2Coding 13pt 폰트"
-echo "     ✓ 하단 Status Bar (CPU, Memory, Network, Battery, Host)"
-echo "     ✓ 100 columns × 25 rows"
+echo "     ✓ 어두운 배경"
+echo "     ✓ D2Coding 폰트"
+echo "     ✓ 하단 Status Bar (CPU, Memory 등)"
 echo ""
 echo "  4️⃣  ZSH 테마 확인 (새 터미널에서):"
 echo "     echo \$ZSH_THEME  # → agnoster"
 echo "     type build_prompt  # → function 확인"
 echo ""
 echo "  5️⃣  Stats 메뉴바 위젯 확인"
-echo "     → 메뉴바 오른쪽에 시스템 모니터 표시"
 echo ""
-echo "💡 참고:"
-echo "   - Dynamic Profile: ✅ 생성 완료"
-echo "   - 기본 GUID 설정: ✅ 완료"
-echo "   - Stats 설정: ✅ 적용 완료"
-echo "   - 최종 단계: 2단계 프로파일 설정만 진행하면 끝!"
+echo "  6️⃣  Rectangle 윈도우 관리 설정 (선택사항 - 3분):"
+echo "     a. System Settings > Privacy & Security > Accessibility"
+echo "        → Rectangle 체크 (필수)"
+echo "     b. Rectangle Preferences (⌘,)"
+echo "        → 키보드 단축키 확인/변경"
+echo ""
+echo "     기본 단축키:"
+echo "        ⌃⌥→ : 오른쪽 절반    ⌃⌥← : 왼쪽 절반"
+echo "        ⌃⌥↑ : 최대화         ⌃⌥↓ : 하단 정렬"
+echo "        ⌃⌥F : 전체 화면      ⌃⌥C : 가운데"
+echo ""
+echo "  7️⃣  AppCleaner 사용법:"
+echo "     - Applications 폴더에서 AppCleaner 실행"
+echo "     - 앱 삭제 시 관련 파일까지 자동 정리"
+echo "     - 추천: Dock에 추가하여 사용"
+echo ""
+echo "💡 설치된 앱 목록:"
+echo "   ✅ iTerm2 (터미널)"
+echo "   ✅ Stats (시스템 모니터)"
+echo "   ✅ Rectangle (윈도우 관리)"
+echo "   ✅ AppCleaner (앱 제거 도구)"
+echo "   ✅ Cursor, Notion, Discord, Slack"
+echo "   ✅ IINA, Telegram, Chrome"
+echo "   ✅ Tunnelblick (VPN)"
 echo ""
 echo "🔧 문제 발생 시:"
-echo "   - iTerm2가 실행 안 되면: Spotlight에서 'iTerm' 검색 후 실행"
-echo "   - 프로파일 목록에 nad4-profile 없으면:"
-echo "     Settings > Profiles > Other Actions > Import JSON"
-echo "     → iterm2-settings/profile.json 선택"
+echo "   - brew 명령어 오류: 새 터미널 열기"
+echo "   - iTerm2 프로파일 없음: profile.json 확인"
+echo "   - Rectangle/Stats 설정 오류: 수동 설정"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
