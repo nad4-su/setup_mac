@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backups
+*.backup_*
+*.bak
+
+# Temporary files
+*.tmp
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Personal configs (if needed)
+# personal-settings/
