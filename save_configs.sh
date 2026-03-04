@@ -7,6 +7,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ITERM_SETTINGS_DIR="$SCRIPT_DIR/iterm2-settings"
 STATS_SETTINGS_DIR="$SCRIPT_DIR/stats-settings"
+RECTANGLE_SETTINGS_DIR="$SCRIPT_DIR/rectangle-settings"
 
 echo "📦 현재 설정을 저장합니다..."
 echo ""
@@ -34,6 +35,7 @@ echo ""
 # Stats 설정 저장
 if [ -f "$HOME/Library/Preferences/eu.exelban.Stats.plist" ]; then
   echo "📊 Stats 설정 저장 중..."
+  mkdir -p "$STATS_SETTINGS_DIR"
   cp "$HOME/Library/Preferences/eu.exelban.Stats.plist" \
      "$STATS_SETTINGS_DIR/Stats.plist"
   echo "✅ Stats 설정 저장 완료"

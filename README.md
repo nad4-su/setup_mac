@@ -4,18 +4,20 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 
 ## 📦 설치 항목
 
+### 개발 도구
+- Homebrew
+- Node.js
+- iTerm2
+- Oh My Zsh (agnoster 멀티라인 테마)
+- zsh-syntax-highlighting / zsh-autosuggestions
+- **VSCode** + Claude 확장
+- **Claude Code CLI**
+- Cursor (에디터)
+
 ### 유틸리티
 - **Stats**: 시스템 모니터 (CPU, Memory, Network 등)
 - **Rectangle**: 윈도우 관리 (무료 Magnet 대안)
 - **AppCleaner**: 앱 완전 삭제 도구
-
-### 개발 도구
-- Homebrew
-- iTerm2
-- Oh My Zsh
-- zsh-syntax-highlighting
-- zsh-autosuggestions
-- Cursor (에디터)
 
 ### 폰트
 - D2Coding
@@ -62,13 +64,14 @@ chmod +x setup_mac.sh
 setup_mac/
 ├── setup_mac.sh              # 메인 설치 스크립트
 ├── save_configs.sh           # 설정 저장 스크립트
+├── .gitignore
 ├── iterm2-settings/
 │   └── profile.json          # iTerm2 프로파일
 ├── stats-settings/
 │   └── Stats.plist           # Stats 설정
 ├── rectangle-settings/
-│   └── com.knollsoft.Rectangle.plist
-└── README.md                 # 이 파일
+│   └── RectangleConfig.json  # Rectangle 설정
+└── README.md
 ```
 
 ## ⚙️ 설정 내용
@@ -83,6 +86,11 @@ setup_mac/
 ### ZSH 테마
 - **테마**: agnoster (멀티라인)
 - **플러그인**: syntax-highlighting, autosuggestions
+
+### Claude Code
+- **CLI**: `npm install -g @anthropic-ai/claude-code` 로 자동 설치
+- **VSCode 확장**: `code --install-extension` 으로 자동 설치
+- 최초 실행 시 Anthropic API 키 설정 필요
 
 ### Stats 설정
 - 자동으로 사용자 정의 설정 적용
@@ -154,6 +162,11 @@ git push
 - [ ] Syntax highlighting 작동 확인
 - [ ] Autosuggestions 작동 확인
 
+### Claude Code 확인
+- [ ] `claude --version` → 버전 출력 확인
+- [ ] `claude` → 최초 실행 시 API 키 설정
+- [ ] VSCode Extensions (⌘⇧X) → Claude 확장 설치 확인
+
 ## 🛠️ 문제 해결
 
 ### iTerm2 프로파일이 적용되지 않는 경우
@@ -184,6 +197,27 @@ open -a Stats
 # 백업에서 복원
 cp ~/.zshrc.backup_YYYYMMDD_HHMMSS ~/.zshrc
 exec zsh
+```
+
+### Claude Code CLI가 동작하지 않는 경우
+```bash
+# Node.js 확인
+node --version
+
+# Claude Code 재설치
+npm install -g @anthropic-ai/claude-code
+
+# API 키 재설정
+claude config
+```
+
+### VSCode Claude 확장이 설치되지 않는 경우
+```bash
+# code 명령 설치 (VSCode 실행 후)
+# ⌘⇧P → 'Shell Command: Install code command in PATH'
+
+# 확장 수동 설치
+code --install-extension anthropic.claude-code
 ```
 
 ### 폰트가 표시되지 않는 경우
@@ -220,7 +254,10 @@ git pull
 - [Homebrew](https://brew.sh/)
 - [iTerm2](https://iterm2.com/)
 - [Oh My Zsh](https://ohmyz.sh/)
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- [VSCode](https://code.visualstudio.com/)
 - [Stats](https://github.com/exelban/stats)
+- [Rectangle](https://rectangleapp.com/)
 - [D2Coding Font](https://github.com/naver/d2codingfont)
 
 ## 💡 팁
@@ -239,11 +276,9 @@ chmod +x setup_mac.sh
 
 ### 정기적인 설정 백업
 ```bash
-# crontab으로 자동 백업 (선택사항)
-crontab -e
-
-# 매주 일요일 오후 6시에 설정 백업
-0 18 * * 0 cd ~/workspace/nad4/setup_mac && cp ~/Library/Preferences/eu.exelban.Stats.plist stats-settings/Stats.plist && git add . && git commit -m "Auto backup: $(date)" && git push
+# 매주 일요일 오후 6시에 설정 백업 (선택사항)
+# crontab -e 후 아래 줄 추가:
+0 18 * * 0 cd ~/workspace/nad4/setup_mac && ./save_configs.sh --auto
 ```
 
 ## 📝 라이선스
