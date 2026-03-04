@@ -141,7 +141,7 @@ for app in "${APPS[@]}"; do
     echo "✅ $app 이미 설치됨"
   else
     echo "📦 $app 설치 중..."
-    brew install --cask "$app"
+    brew install --cask "$app" || echo "⚠️ $app 설치 실패. 나중에 수동으로 설치해주세요."
   fi
 done
 
@@ -156,7 +156,7 @@ echo "🤖 Node.js & Claude Code 설치 중..."
 if brew list node &> /dev/null; then
   echo "✅ Node.js 이미 설치됨"
 else
-  brew install node
+  brew install node || { echo "⚠️ Node.js 설치 실패"; }
   echo "✅ Node.js 설치 완료"
 fi
 
@@ -164,7 +164,7 @@ fi
 if command -v claude &> /dev/null; then
   echo "✅ Claude Code CLI 이미 설치됨"
 else
-  npm install -g @anthropic-ai/claude-code
+  npm install -g @anthropic-ai/claude-code || { echo "⚠️ Claude Code CLI 설치 실패. Node.js 설치를 확인해주세요."; }
   echo "✅ Claude Code CLI 설치 완료"
 fi
 
