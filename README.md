@@ -14,6 +14,8 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 - zsh-syntax-highlighting / zsh-autosuggestions
 - **VSCode** + Claude 확장
 - **Claude Code CLI**
+- **Codex CLI**
+- **VSCode OpenAI 확장**
 - Cursor (에디터)
 - **Codex shared workspace bootstrap**
 
@@ -100,6 +102,19 @@ setup_mac/
 - `bootstrap-codex.sh` 자동 실행
 - `~/workspace/AGENTS.md` 등 공통 링크 자동 구성
 - `harness-diagnostics`, `gstack` 등 Codex skill 자동 bootstrap
+- `@openai/codex` CLI 자동 설치
+- VSCode OpenAI 확장 자동 설치
+
+## OpenAI 공식 기준 반영
+
+다음 기준을 반영했습니다.
+
+- Codex CLI: OpenAI Codex docs의 `npm i -g @openai/codex`
+- VSCode OpenAI 확장: OpenAI Help Center의 `openai.chatgpt`
+
+참고:
+- [Codex CLI docs](https://developers.openai.com/codex/cli)
+- [OpenAI VSCode extension help](https://help.openai.com/en/articles/10128592-how-to-install-the-work-with-apps-visual-studio-code-extension)
 
 ### Stats 설정
 - 자동으로 사용자 정의 설정 적용
@@ -177,10 +192,13 @@ git push
 - [ ] VSCode Extensions (⌘⇧X) → Claude 확장 설치 확인
 
 ### Codex 확인
+- [ ] `codex --version`
+- [ ] `codex` 실행 후 로그인 가능 여부 확인
 - [ ] `ls -l ~/workspace/AGENTS.md` → codex 경로로 링크 확인
 - [ ] `ls ~/.codex/skills | grep harness-diagnostics`
 - [ ] `ls ~/.codex/skills | grep gstack-review`
 - [ ] `test -f ~/.codex/config.toml`
+- [ ] VSCode Extensions에서 `OpenAI / ChatGPT` 확장 확인
 
 ## 🛠️ 문제 해결
 
@@ -226,13 +244,28 @@ npm install -g @anthropic-ai/claude-code
 claude config
 ```
 
+### Codex CLI가 동작하지 않는 경우
+```bash
+# Node.js 확인
+node --version
+
+# Codex 재설치
+npm install -g @openai/codex
+
+# 로그인
+codex
+```
+
 ### VSCode Claude 확장이 설치되지 않는 경우
 ```bash
 # code 명령 설치 (VSCode 실행 후)
 # ⌘⇧P → 'Shell Command: Install code command in PATH'
 
-# 확장 수동 설치
+# Claude 확장 수동 설치
 code --install-extension anthropic.claude-code
+
+# OpenAI 확장 수동 설치
+code --install-extension openai.chatgpt
 ```
 
 ### 폰트가 표시되지 않는 경우

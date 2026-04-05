@@ -3,7 +3,7 @@
 # =============================================================================
 # Mac 초기 개발 환경 설정 스크립트
 # 작성자: NAD4
-# 설명: Homebrew, iTerm2, Oh My Zsh, Claude Code, VSCode, 필수 앱 자동 설치 및 설정
+# 설명: Homebrew, iTerm2, Oh My Zsh, Claude Code, Codex, VSCode, 필수 앱 자동 설치 및 설정
 # =============================================================================
 
 set -e  # 에러 발생 시 스크립트 중단
@@ -151,9 +151,9 @@ done
 echo ""
 
 # =============================================================================
-# 7. Node.js & Claude Code CLI 설치
+# 7. Node.js, Claude Code CLI, Codex CLI 설치
 # =============================================================================
-echo "🤖 Node.js & Claude Code 설치 중..."
+echo "🤖 Node.js, Claude Code, Codex 설치 중..."
 
 # Node.js
 if brew list node &> /dev/null; then
@@ -169,6 +169,14 @@ if command -v claude &> /dev/null; then
 else
   npm install -g @anthropic-ai/claude-code || { echo "⚠️ Claude Code CLI 설치 실패. Node.js 설치를 확인해주세요."; }
   echo "✅ Claude Code CLI 설치 완료"
+fi
+
+# Codex CLI
+if command -v codex &> /dev/null; then
+  echo "✅ Codex CLI 이미 설치됨"
+else
+  npm install -g @openai/codex || { echo "⚠️ Codex CLI 설치 실패. Node.js 설치를 확인해주세요."; }
+  echo "✅ Codex CLI 설치 완료"
 fi
 
 echo ""
@@ -194,10 +202,18 @@ if [ -n "$CODE_CMD" ]; then
     echo "⚠️ Claude 확장 자동 설치 실패"
     echo "   VSCode에서 수동 설치: Extensions (⌘⇧X) → 'Claude' 검색"
   fi
+
+  # OpenAI VSCode 확장 설치
+  if "$CODE_CMD" --install-extension openai.chatgpt 2>/dev/null; then
+    echo "✅ OpenAI VSCode 확장 설치 완료"
+  else
+    echo "⚠️ OpenAI VSCode 확장 자동 설치 실패"
+    echo "   VSCode에서 수동 설치: Extensions (⌘⇧X) → 'OpenAI' 또는 'ChatGPT' 검색"
+  fi
 else
   echo "⚠️ VSCode code 명령을 찾을 수 없습니다."
   echo "   VSCode 실행 후: ⌘⇧P → 'Shell Command: Install code command in PATH'"
-  echo "   이후 Extensions에서 'Claude' 확장을 수동 설치해주세요."
+  echo "   이후 Extensions에서 'Claude' 및 'OpenAI' 확장을 수동 설치해주세요."
 fi
 
 echo ""
@@ -558,16 +574,22 @@ echo "     claude --version  # → 버전 확인"
 echo "     claude            # → Claude Code 실행"
 echo "     ※ 최초 실행 시 API 키 설정 필요"
 echo ""
-echo "  8️⃣  Codex 공유 환경 확인:"
+echo "  8️⃣  Codex 확인:"
+echo "     codex --version   # → Codex CLI 버전 확인"
+echo "     codex             # → 최초 실행 시 로그인 진행"
+echo ""
+echo "  9️⃣  Codex 공유 환경 확인:"
 echo "     ls -l ~/workspace/AGENTS.md"
 echo "     ls ~/.codex/skills | grep harness-diagnostics"
 echo "     ls ~/.codex/skills | grep gstack-review"
 echo "     ※ 필요 시: bash ~/workspace/codex/scripts/update-vendor.sh"
 echo ""
-echo "  9️⃣  VSCode Claude 확장 확인:"
-echo "     VSCode 실행 → Extensions (⌘⇧X) → 'Claude' 설치 확인"
+echo "  🔟  VSCode 확장 확인:"
+echo "     VSCode 실행 → Extensions (⌘⇧X)"
+echo "     → 'Claude' 설치 확인"
+echo "     → 'OpenAI / ChatGPT' 설치 확인"
 echo ""
-echo "  🔟  AppCleaner 사용법:"
+echo "  1️⃣1️⃣  AppCleaner 사용법:"
 echo "     - Applications 폴더에서 AppCleaner 실행"
 echo "     - 앱 삭제 시 관련 파일까지 자동 정리"
 echo "     - 추천: Dock에 추가하여 사용"
@@ -576,6 +598,8 @@ echo "💡 설치된 앱 목록:"
 echo "   ✅ iTerm2 (터미널)"
 echo "   ✅ VSCode + Claude 확장"
 echo "   ✅ Claude Code CLI"
+echo "   ✅ Codex CLI"
+echo "   ✅ VSCode OpenAI 확장"
 echo "   ✅ Shared Codex workspace bootstrap"
 echo "   ✅ Stats (시스템 모니터)"
 echo "   ✅ Rectangle (윈도우 관리)"
