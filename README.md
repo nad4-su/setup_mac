@@ -2,6 +2,8 @@
 
 Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 
+이제 이 저장소는 기본 개발 환경뿐 아니라 shared Codex 환경까지 함께 세팅합니다.
+
 ## 📦 설치 항목
 
 ### 개발 도구
@@ -13,6 +15,7 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 - **VSCode** + Claude 확장
 - **Claude Code CLI**
 - Cursor (에디터)
+- **Codex shared workspace bootstrap**
 
 ### 유틸리티
 - **Stats**: 시스템 모니터 (CPU, Memory, Network 등)
@@ -39,10 +42,10 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 ```bash
 # 1. 저장소 클론
 cd ~/workspace
-git clone <repository-url> nad4
+git clone https://github.com/nad4-su/setup_mac.git
 
 # 2. 스크립트 실행
-cd nad4/setup_mac
+cd setup_mac
 chmod +x setup_mac.sh
 ./setup_mac.sh
 ```
@@ -51,10 +54,10 @@ chmod +x setup_mac.sh
 ```bash
 # 1. 저장소 클론
 cd ~/workspace
-git clone <repository-url> nad4
+git clone https://github.com/nad4-su/setup_mac.git
 
 # 2. 스크립트 실행 (기존 설정 적용)
-cd nad4/setup_mac
+cd setup_mac
 chmod +x setup_mac.sh
 ./setup_mac.sh
 ```
@@ -91,6 +94,12 @@ setup_mac/
 - **CLI**: `npm install -g @anthropic-ai/claude-code` 로 자동 설치
 - **VSCode 확장**: `code --install-extension` 으로 자동 설치
 - 최초 실행 시 Anthropic API 키 설정 필요
+
+### Codex 공유 환경
+- `https://github.com/nad4-su/codex` 를 `~/workspace/codex` 로 자동 clone
+- `bootstrap-codex.sh` 자동 실행
+- `~/workspace/AGENTS.md` 등 공통 링크 자동 구성
+- `harness-diagnostics`, `gstack` 등 Codex skill 자동 bootstrap
 
 ### Stats 설정
 - 자동으로 사용자 정의 설정 적용
@@ -167,6 +176,12 @@ git push
 - [ ] `claude` → 최초 실행 시 API 키 설정
 - [ ] VSCode Extensions (⌘⇧X) → Claude 확장 설치 확인
 
+### Codex 확인
+- [ ] `ls -l ~/workspace/AGENTS.md` → codex 경로로 링크 확인
+- [ ] `ls ~/.codex/skills | grep harness-diagnostics`
+- [ ] `ls ~/.codex/skills | grep gstack-review`
+- [ ] `test -f ~/.codex/config.toml`
+
 ## 🛠️ 문제 해결
 
 ### iTerm2 프로파일이 적용되지 않는 경우
@@ -240,7 +255,7 @@ cd ~/workspace/nad4/setup_mac
 
 ### 전체 설정 복원
 ```bash
-cd ~/workspace/nad4/setup_mac
+cd ~/workspace/setup_mac
 
 # Git에서 최신 설정 가져오기
 git pull
@@ -255,6 +270,7 @@ git pull
 - [iTerm2](https://iterm2.com/)
 - [Oh My Zsh](https://ohmyz.sh/)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- [Codex Shared Repo](https://github.com/nad4-su/codex)
 - [VSCode](https://code.visualstudio.com/)
 - [Stats](https://github.com/exelban/stats)
 - [Rectangle](https://rectangleapp.com/)

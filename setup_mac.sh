@@ -10,6 +10,9 @@ set -e  # 에러 발생 시 스크립트 중단
 
 # 스크립트 실행 위치 확인
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="${HOME}/workspace"
+CODEX_REPO_URL="https://github.com/nad4-su/codex.git"
+CODEX_REPO_DIR="${WORKSPACE_ROOT}/codex"
 ITERM_SETTINGS_DIR="$SCRIPT_DIR/iterm2-settings"
 STATS_SETTINGS_DIR="$SCRIPT_DIR/stats-settings"
 RECTANGLE_SETTINGS_DIR="$SCRIPT_DIR/rectangle-settings"
@@ -200,7 +203,36 @@ fi
 echo ""
 
 # =============================================================================
-# 9. .zshrc 설정
+# 9. 공유 Codex 저장소 및 bootstrap 설정
+# =============================================================================
+echo "🤖 Codex 공유 설정 저장소 구성 중..."
+
+mkdir -p "$WORKSPACE_ROOT"
+
+if [ -d "$CODEX_REPO_DIR/.git" ]; then
+  echo "✅ codex 저장소 이미 존재: $CODEX_REPO_DIR"
+else
+  echo "📦 codex 저장소 clone 중..."
+  git clone "$CODEX_REPO_URL" "$CODEX_REPO_DIR" || {
+    echo "⚠️ codex 저장소 clone 실패"
+    echo "   수동 실행: git clone $CODEX_REPO_URL $CODEX_REPO_DIR"
+  }
+fi
+
+if [ -x "$CODEX_REPO_DIR/scripts/bootstrap-codex.sh" ]; then
+  echo "🚀 codex bootstrap 실행 중..."
+  bash "$CODEX_REPO_DIR/scripts/bootstrap-codex.sh" "$WORKSPACE_ROOT" || {
+    echo "⚠️ codex bootstrap 실패"
+    echo "   수동 실행: bash $CODEX_REPO_DIR/scripts/bootstrap-codex.sh $WORKSPACE_ROOT"
+  }
+else
+  echo "⚠️ bootstrap-codex.sh를 찾을 수 없습니다."
+fi
+
+echo ""
+
+# =============================================================================
+# 10. .zshrc 설정
 # =============================================================================
 echo "🎨 ZSH 설정 파일 구성 중..."
 
@@ -302,7 +334,7 @@ echo "✅ .zshrc 설정 완료"
 echo ""
 
 # =============================================================================
-# 10. iTerm2 프로파일 설정
+# 11. iTerm2 프로파일 설정
 # =============================================================================
 echo "⚙️ iTerm2 프로파일 설정 중..."
 
@@ -361,7 +393,7 @@ fi
 echo ""
 
 # =============================================================================
-# 11. Stats 앱 설정
+# 12. Stats 앱 설정
 # =============================================================================
 echo "📊 Stats 앱 설정 중..."
 
@@ -413,7 +445,7 @@ fi
 echo ""
 
 # =============================================================================
-# 12. Rectangle 앱 설정
+# 13. Rectangle 앱 설정
 # =============================================================================
 echo "📐 Rectangle 앱 설정 중..."
 
@@ -526,10 +558,16 @@ echo "     claude --version  # → 버전 확인"
 echo "     claude            # → Claude Code 실행"
 echo "     ※ 최초 실행 시 API 키 설정 필요"
 echo ""
-echo "  8️⃣  VSCode Claude 확장 확인:"
+echo "  8️⃣  Codex 공유 환경 확인:"
+echo "     ls -l ~/workspace/AGENTS.md"
+echo "     ls ~/.codex/skills | grep harness-diagnostics"
+echo "     ls ~/.codex/skills | grep gstack-review"
+echo "     ※ 필요 시: bash ~/workspace/codex/scripts/update-vendor.sh"
+echo ""
+echo "  9️⃣  VSCode Claude 확장 확인:"
 echo "     VSCode 실행 → Extensions (⌘⇧X) → 'Claude' 설치 확인"
 echo ""
-echo "  9️⃣  AppCleaner 사용법:"
+echo "  🔟  AppCleaner 사용법:"
 echo "     - Applications 폴더에서 AppCleaner 실행"
 echo "     - 앱 삭제 시 관련 파일까지 자동 정리"
 echo "     - 추천: Dock에 추가하여 사용"
@@ -538,6 +576,7 @@ echo "💡 설치된 앱 목록:"
 echo "   ✅ iTerm2 (터미널)"
 echo "   ✅ VSCode + Claude 확장"
 echo "   ✅ Claude Code CLI"
+echo "   ✅ Shared Codex workspace bootstrap"
 echo "   ✅ Stats (시스템 모니터)"
 echo "   ✅ Rectangle (윈도우 관리)"
 echo "   ✅ AppCleaner (앱 제거 도구)"
