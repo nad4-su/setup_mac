@@ -10,11 +10,12 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 - Homebrew
 - Node.js
 - iTerm2
+- **cmux** + CLI 링크
 - Oh My Zsh (agnoster 멀티라인 테마)
 - zsh-syntax-highlighting / zsh-autosuggestions
 - **VSCode** + Claude 확장
-- **Claude Code CLI**
-- **Codex CLI**
+- **Claude Code CLI** (설치/업데이트)
+- **Codex CLI** (설치/업데이트)
 - **VSCode OpenAI 확장**
 - Cursor (에디터)
 - **Codex shared workspace bootstrap**
@@ -93,16 +94,21 @@ setup_mac/
 - **플러그인**: syntax-highlighting, autosuggestions
 
 ### Claude Code
-- **CLI**: `npm install -g @anthropic-ai/claude-code` 로 자동 설치
+- **CLI**: `npm install -g @anthropic-ai/claude-code` 로 자동 설치/업데이트
 - **VSCode 확장**: `code --install-extension` 으로 자동 설치
 - 최초 실행 시 Anthropic API 키 설정 필요
+
+### cmux
+- **앱**: `brew tap manaflow-ai/cmux` 후 `brew install --cask cmux` 로 자동 설치
+- **CLI**: `/Applications/cmux.app/Contents/Resources/bin/cmux` 를 Homebrew bin 경로에 링크
+- cmux 외부 터미널에서도 `cmux` 명령을 사용할 수 있도록 구성
 
 ### Codex 공유 환경
 - `https://github.com/nad4-su/codex` 를 `~/workspace/codex` 로 자동 clone
 - `bootstrap-codex.sh` 자동 실행
 - `~/workspace/AGENTS.md` 등 공통 링크 자동 구성
 - `harness-diagnostics`, `gstack` 등 Codex skill 자동 bootstrap
-- `@openai/codex` CLI 자동 설치
+- `@openai/codex` CLI 자동 설치/업데이트
 - VSCode OpenAI 확장 자동 설치
 
 ## OpenAI 공식 기준 반영
@@ -200,6 +206,11 @@ git push
 - [ ] `test -f ~/.codex/config.toml`
 - [ ] VSCode Extensions에서 `OpenAI / ChatGPT` 확장 확인
 
+### cmux 확인
+- [ ] `open -a cmux` → cmux 앱 실행 확인
+- [ ] `cmux` → 외부 터미널에서 CLI 실행 확인
+- [ ] `ls -l /opt/homebrew/bin/cmux` 또는 `ls -l /usr/local/bin/cmux`
+
 ## 🛠️ 문제 해결
 
 ### iTerm2 프로파일이 적용되지 않는 경우
@@ -256,6 +267,22 @@ npm install -g @openai/codex
 codex
 ```
 
+### cmux CLI가 동작하지 않는 경우
+```bash
+# cmux 앱 설치 확인
+ls -la /Applications/cmux.app
+
+# cmux 재설치
+brew tap manaflow-ai/cmux
+brew reinstall --cask cmux
+
+# Apple Silicon 기본 경로
+ln -sf "/Applications/cmux.app/Contents/Resources/bin/cmux" /opt/homebrew/bin/cmux
+
+# 권한이 필요한 경우
+sudo ln -sf "/Applications/cmux.app/Contents/Resources/bin/cmux" /usr/local/bin/cmux
+```
+
 ### VSCode Claude 확장이 설치되지 않는 경우
 ```bash
 # code 명령 설치 (VSCode 실행 후)
@@ -301,6 +328,7 @@ git pull
 
 - [Homebrew](https://brew.sh/)
 - [iTerm2](https://iterm2.com/)
+- [cmux](https://cmux.com/docs/getting-started)
 - [Oh My Zsh](https://ohmyz.sh/)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 - [Codex Shared Repo](https://github.com/nad4-su/codex)

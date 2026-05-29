@@ -3,7 +3,7 @@
 # =============================================================================
 # Mac 초기 개발 환경 설정 스크립트
 # 작성자: NAD4
-# 설명: Homebrew, iTerm2, Oh My Zsh, Claude Code, Codex, VSCode, 필수 앱 자동 설치 및 설정
+# 설명: Homebrew, iTerm2, cmux, Oh My Zsh, Claude Code, Codex, VSCode, 필수 앱 자동 설치 및 설정
 # =============================================================================
 
 set -e  # 에러 발생 시 스크립트 중단
@@ -43,6 +43,19 @@ fi
 
 echo "📦 Homebrew 업데이트 중..."
 brew update
+
+echo ""
+
+# =============================================================================
+# 1-1. Homebrew tap 구성
+# =============================================================================
+echo "📦 Homebrew tap 구성 중..."
+
+if brew tap | grep -q "^manaflow-ai/cmux$"; then
+  echo "✅ cmux tap 이미 구성됨"
+else
+  brew tap manaflow-ai/cmux || echo "⚠️ cmux tap 구성 실패. cmux 설치를 나중에 수동으로 진행해주세요."
+fi
 
 echo ""
 
@@ -137,6 +150,7 @@ APPS=(
   "stats"
   "rectangle"
   "appcleaner"
+  "cmux"
 )
 
 for app in "${APPS[@]}"; do
@@ -150,10 +164,35 @@ done
 
 echo ""
 
+# cmux CLI 링크 설정
+echo "🔗 cmux CLI 설정 중..."
+CMUX_APP_CLI="/Applications/cmux.app/Contents/Resources/bin/cmux"
+
+if [ -x "$CMUX_APP_CLI" ]; then
+  if [[ $(uname -m) == "arm64" ]] && [ -d "/opt/homebrew/bin" ]; then
+    CMUX_LINK_DIR="/opt/homebrew/bin"
+  else
+    CMUX_LINK_DIR="/usr/local/bin"
+  fi
+
+  if [ -w "$CMUX_LINK_DIR" ]; then
+    ln -sf "$CMUX_APP_CLI" "$CMUX_LINK_DIR/cmux"
+    echo "✅ cmux CLI 링크 설정 완료: $CMUX_LINK_DIR/cmux"
+  else
+    echo "⚠️ $CMUX_LINK_DIR 에 쓰기 권한이 없어 cmux CLI 링크를 만들 수 없습니다."
+    echo "   수동 실행: sudo ln -sf \"$CMUX_APP_CLI\" \"$CMUX_LINK_DIR/cmux\""
+  fi
+else
+  echo "⚠️ cmux 앱 CLI를 찾을 수 없습니다."
+  echo "   cmux 첫 실행 후 필요 시 수동 확인: $CMUX_APP_CLI"
+fi
+
+echo ""
+
 # =============================================================================
-# 7. Node.js, Claude Code CLI, Codex CLI 설치
+# 7. Node.js, Claude Code CLI, Codex CLI 설치/업데이트
 # =============================================================================
-echo "🤖 Node.js, Claude Code, Codex 설치 중..."
+echo "🤖 Node.js, Claude Code, Codex 설치/업데이트 중..."
 
 # Node.js
 if brew list node &> /dev/null; then
@@ -163,21 +202,27 @@ else
   echo "✅ Node.js 설치 완료"
 fi
 
-# Claude Code CLI
-if command -v claude &> /dev/null; then
-  echo "✅ Claude Code CLI 이미 설치됨"
-else
-  npm install -g @anthropic-ai/claude-code || { echo "⚠️ Claude Code CLI 설치 실패. Node.js 설치를 확인해주세요."; }
-  echo "✅ Claude Code CLI 설치 완료"
-fi
+install_or_update_npm_cli() {
+  local package_name="$1"
+  local command_name="$2"
+  local display_name="$3"
 
-# Codex CLI
-if command -v codex &> /dev/null; then
-  echo "✅ Codex CLI 이미 설치됨"
-else
-  npm install -g @openai/codex || { echo "⚠️ Codex CLI 설치 실패. Node.js 설치를 확인해주세요."; }
-  echo "✅ Codex CLI 설치 완료"
-fi
+  if command -v "$command_name" &> /dev/null; then
+    echo "🔄 $display_name 업데이트 확인 중..."
+  else
+    echo "📦 $display_name 설치 중..."
+  fi
+
+  if npm install -g "$package_name"; then
+    echo "✅ $display_name 설치/업데이트 완료"
+    "$command_name" --version 2>/dev/null || true
+  else
+    echo "⚠️ $display_name 설치/업데이트 실패. Node.js와 npm 설정을 확인해주세요."
+  fi
+}
+
+install_or_update_npm_cli "@anthropic-ai/claude-code" "claude" "Claude Code CLI"
+install_or_update_npm_cli "@openai/codex" "codex" "Codex CLI"
 
 echo ""
 
@@ -584,18 +629,23 @@ echo "     ls ~/.codex/skills | grep harness-diagnostics"
 echo "     ls ~/.codex/skills | grep gstack-review"
 echo "     ※ 필요 시: bash ~/workspace/codex/scripts/update-vendor.sh"
 echo ""
-echo "  🔟  VSCode 확장 확인:"
+echo "  🔟  cmux 확인:"
+echo "     cmux              # → cmux CLI 실행 확인"
+echo "     open -a cmux      # → cmux 앱 실행"
+echo ""
+echo "  1️⃣1️⃣  VSCode 확장 확인:"
 echo "     VSCode 실행 → Extensions (⌘⇧X)"
 echo "     → 'Claude' 설치 확인"
 echo "     → 'OpenAI / ChatGPT' 설치 확인"
 echo ""
-echo "  1️⃣1️⃣  AppCleaner 사용법:"
+echo "  1️⃣2️⃣  AppCleaner 사용법:"
 echo "     - Applications 폴더에서 AppCleaner 실행"
 echo "     - 앱 삭제 시 관련 파일까지 자동 정리"
 echo "     - 추천: Dock에 추가하여 사용"
 echo ""
 echo "💡 설치된 앱 목록:"
 echo "   ✅ iTerm2 (터미널)"
+echo "   ✅ cmux (AI agent 멀티 터미널)"
 echo "   ✅ VSCode + Claude 확장"
 echo "   ✅ Claude Code CLI"
 echo "   ✅ Codex CLI"
