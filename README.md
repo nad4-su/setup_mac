@@ -14,6 +14,7 @@ Mac 개발 환경을 자동으로 설정하는 스크립트입니다.
 - Oh My Zsh (agnoster 멀티라인 테마)
 - zsh-syntax-highlighting / zsh-autosuggestions
 - **VSCode** + Claude 확장
+- **Docker Desktop**
 - **Claude Code CLI** (설치/업데이트)
 - **Codex CLI** (설치/업데이트)
 - **VSCode OpenAI 확장**
@@ -102,6 +103,11 @@ setup_mac/
 - **앱**: `brew tap manaflow-ai/cmux` 후 `brew install --cask cmux` 로 자동 설치
 - **CLI**: `/Applications/cmux.app/Contents/Resources/bin/cmux` 를 Homebrew bin 경로에 링크
 - cmux 외부 터미널에서도 `cmux` 명령을 사용할 수 있도록 구성
+
+### Docker Desktop
+- **앱**: `brew install --cask docker-desktop` 으로 자동 설치
+- **CLI**: Docker Desktop이 제공하는 `docker`, `docker compose` 사용
+- 최초 실행 시 macOS 권한 승인 또는 Docker 계정 로그인이 필요할 수 있음
 
 ### Codex 공유 환경
 - `https://github.com/nad4-su/codex` 를 `~/workspace/codex` 로 자동 clone
@@ -211,6 +217,12 @@ git push
 - [ ] `cmux` → 외부 터미널에서 CLI 실행 확인
 - [ ] `ls -l /opt/homebrew/bin/cmux` 또는 `ls -l /usr/local/bin/cmux`
 
+### Docker Desktop 확인
+- [ ] `open -a Docker` → Docker Desktop 최초 실행
+- [ ] `docker --version`
+- [ ] `docker compose version`
+- [ ] `docker run hello-world`
+
 ## 🛠️ 문제 해결
 
 ### iTerm2 프로파일이 적용되지 않는 경우
@@ -283,6 +295,22 @@ ln -sf "/Applications/cmux.app/Contents/Resources/bin/cmux" /opt/homebrew/bin/cm
 sudo ln -sf "/Applications/cmux.app/Contents/Resources/bin/cmux" /usr/local/bin/cmux
 ```
 
+### Docker Desktop 설치 또는 CLI가 동작하지 않는 경우
+```bash
+# Docker Desktop 재설치
+brew reinstall --cask docker-desktop
+
+# 최초 실행
+open -a Docker
+
+# Docker Desktop이 완전히 뜬 뒤 확인
+docker --version
+docker compose version
+docker run hello-world
+```
+
+설치 중 `/usr/local/cli-plugins` 생성에서 관리자 비밀번호를 요구할 수 있습니다. 이 경우 일반 터미널에서 명령을 실행하고 macOS 비밀번호를 입력하세요.
+
 ### VSCode Claude 확장이 설치되지 않는 경우
 ```bash
 # code 명령 설치 (VSCode 실행 후)
@@ -329,6 +357,7 @@ git pull
 - [Homebrew](https://brew.sh/)
 - [iTerm2](https://iterm2.com/)
 - [cmux](https://cmux.com/docs/getting-started)
+- [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
 - [Oh My Zsh](https://ohmyz.sh/)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 - [Codex Shared Repo](https://github.com/nad4-su/codex)
